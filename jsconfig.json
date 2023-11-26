@@ -1,0 +1,14 @@
+/*
+ * @Title: This is a  file for ……
+ * @Author: JackieZheng
+ * @Date: 2022-11-22 08:15:28
+ * @LastEditTime: 2022-11-22 08:28:52
+ * @LastEditors: Please set LastEditors
+ * @Description:
+ * @FilePath: \\VirtualClass\\tsconfig.json
+ */
+{
+    "compilerOptions": {
+        "allowJs": true,
+    }
+}
