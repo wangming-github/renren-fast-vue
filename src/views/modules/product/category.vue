@@ -1,7 +1,8 @@
 <template>
   <div>
     <el-tree show-checkbox node-key="catId" :data="menus" :default-expanded-keys="expandedKeys"
-      :expand-on-click-node="true" :highlight-current="true" width="50%">
+      @node-click="handleNodeClick" :expand-on-click-node="true" :allow-drop="allowDrop"
+      @node-drag-enter="handleDragEnter" @node-drop="handleDrop" draggable width="50%">
       <span class="custom-tree-node" slot-scope="{node,data}">
         <span>{{ node.data.name }}</span>
         <span>
@@ -54,6 +55,7 @@ export default {
   props: {},
   data() {
     return {
+      sortNode: [],
       category: {
         name: null,//
         catId: null,//
@@ -64,6 +66,7 @@ export default {
         showStatus: 1,//默认显示
         sort: 0
       },
+      maxLevel: 0,//获取操作节点的子节点最大Level的值
       labelPosition: 'left',//Dialog对话框中表单对齐方式
       centerDialogVisible: false,//Dialog对话框默认关闭
       menus: [],
@@ -91,6 +94,10 @@ export default {
         //将获取的值赋值给data中的menus
         this.menus = data.data;
       })
+    },
+    // ==========================点击节点==========================
+    handleNodeClick(data) {
+      console.log(data.catId, data.name, data.parentCid);
     },
     // ==========================添加节点==========================
     append(data) {
@@ -209,6 +216,111 @@ export default {
           message: '添修失败!'
         });
       });;
+    },
+    //==========================拖拽操作==========================
+    // 拖拽时判定目标节点能否被放置。
+    // type 参数有三种情况：'prev'、'inner' 和 'next'，分别表示放置在目标节点前、插入至目标节点和放置在目标节点后
+    allowDrop(draggingNode, dropNode, type) {
+      // console.log("参数:", draggingNode, dropNode, type)
+      this.countNodeLevel(draggingNode.data);
+      let deep = this.maxLevel - draggingNode.data.catLevel + 1; //计算拖动节点的层级
+
+      if (type == 'inner') {
+        let bool = (deep + dropNode.level) <= 3;
+        // console.log(draggingNode.data.name, "插入->", dropNode.data.name, "【中】, 当前深度(", deep, ")+目标(", dropNode.level, ")<=3？", bool);
+        return bool;
+      } else {
+        let bool = (deep + dropNode.parent.level) <= 3;
+        // console.log(draggingNode.data.name, "放置->", dropNode.data.name, "【前后】, 当前深度(", deep, ")+目标父(", dropNode.parent.level, ")<=3？", bool);
+        return bool;
+      }
+    },
+    //递归：取操作节点的子节点最大Level的值
+    countNodeLevel(node) {
+      if (node.children != null && node.children.length > 0) {
+        for (let i = 0; i < node.children.length; i++) {
+          if (node.children[i].catLevel > this.maxLevel) {
+            this.maxLevel = node.children[i].catLevel;
+          }
+          this.countNodeLevel(node.children[i]);
+        }
+      }
+    },
+    // 拖拽进入其他节点时触发的事件
+    handleDragEnter(draggingNode, dropNode, ev) {
+      this.$message(`移动到：${dropNode.data.name}`);
+    },
+    // 拖拽成功完成时触发的事件
+    // 共四个参数，依次为：被拖拽节点对应的 Node、结束拖拽时最后进入的节点、被拖拽节点的放置位置（before、after、inner）、event
+    handleDrop(draggingNode, dropNode, dropType, ev) {
+      this.sortNode = [];
+      console.log("拖拽成功完成时触发的事件: 操作节点:", draggingNode, "->目标", dropNode, "位置:【", dropType, "】");
+      console.log("拖拽成功完成时触发的事件: 操作节点名", draggingNode.data.name, "->目标名", dropNode.data.name, "位置:【", dropType, "】");
+      console.log("拖拽成功完成时触发的事件: 操作节点层级", draggingNode.data.catLevel, "->目标层级", dropNode.level, "位置:【", dropType, "】");
+      // 1.从dropNode获取 当前拖拽节点的最新父节点ID
+      let parentCid = 0;
+      let brother = null;
+      if (dropType == 'inner') {
+        // 1.1.当防止位置为目标节点的内部，那么当前拖拽节点的最新父节点ID，就是目标节点的id
+        parentCid = dropNode.data.catId;
+      } else {
+        // 1.2.否则就获取当前目标节点的父节点id
+        parentCid = dropNode.data.parentCid;
+      }
+      console.log("最新父节点ID:", parentCid);
+
+      // 2.从dropNode获取 当前拖拽节点的最新排序
+      if (dropType == 'inner') {
+        // 2.1.当防止位置为目标节点的内部，那么当前拖拽节点的兄弟，就是目标节点的
+        // dropNode.data.children; 不能获取原始数据的子节点，应该获取拖拽完成后的子节点
+        brother = dropNode.childNodes;
+      } else {
+        // 1.2.否则就拖拽完成后的通过父节点获取平级兄弟节点
+        brother = dropNode.parent.childNodes;
+      }
+      console.log("最新父节点ID:", parentCid, "最新兄弟节点:", brother);
+
+      // 4.在3基础上获取最新的层级
+      for (let i = 0; i < brother.length; i++) {
+        if (draggingNode.data.catId == brother[i].data.catId) {//3.1.遍历到自己时，给当前拖拽的节点,添加上最新的id
+
+          console.log(draggingNode.level, "->?", brother[i].level);
+          let newLevel = draggingNode.level;
+          if (draggingNode.level != brother[i].level) {//拖拽级别=目标级别
+            newLevel = brother[i].level;
+            // 修改子分类层级
+            this.updatechildNodesLevel(brother[i]);
+          }
+          this.sortNode.push({ catId: brother[i].data.catId, sort: i, parentCid: parentCid, catLevel: newLevel });  //3.2.从数组的原始对象获取ID,然后封装成新的对象，并且给排序字段赋值，放在draggableNode。
+        } else {//遍历到不是自己时，层级关系不变
+          this.sortNode.push({ catId: brother[i].data.catId, sort: i });  //3.2.从数组的原始对象获取ID,然后封装成新的对象，并且给排序字段赋值，放在draggableNode。
+        }
+      }
+      console.log("最新排序的ID:", this.sortNode);
+
+      // 3.获取这些排好序的兄弟的id
+      // for (let i = 0; i < brother.length; i++) {
+      //   if (draggingNode.data.catId == brother[i].data.catId) {
+      //     console.log(draggingNode.data.catId, "==", brother[i].data.catId);
+      //     //3.1.遍历到自己时，给当前拖拽的节点,添加上最新的id
+      //     this.sortNode.push({ catId: brother[i].data.catId, sort: i, parentCid: parentCid });
+      //   } else {
+      //     console.log(draggingNode.data.catId, "!=", brother[i].data.catId);
+      //     //3.2.从数组的原始对象获取ID,然后封装成新的对象，并且给排序字段赋值，放在draggableNode。
+      //     this.sortNode.push({ catId: brother[i].data.catId, sort: i });
+      //   }
+      // }
+    },
+    // 更新子节点的层级
+    updatechildNodesLevel(node) {
+      if (node.childNodes.length > 0) {
+        for (let i = 0; i < node.childNodes.length; i++) {
+          let childCatId = node.childNodes[i].data.catId;//新位置原始数据的catId
+          let childLevel = node.childNodes[i].level;//新位置的层级
+          this.sortNode.push({ catId: childCatId, catLevel: childLevel });
+          this.updatechildNodesLevel(node.childNodes[i]);//递归
+        }
+      }
     }
   },
   //生命周期- 创建完成（可以访问当前this 实例）
