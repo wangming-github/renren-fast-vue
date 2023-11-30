@@ -1,47 +1,69 @@
 <template>
-  <div>
-    <el-tree show-checkbox node-key="catId" :data="menus" :default-expanded-keys="expandedKeys"
-      @node-click="handleNodeClick" :expand-on-click-node="true" :allow-drop="allowDrop"
-      @node-drag-enter="handleDragEnter" @node-drop="handleDrop" draggable width="50%">
-      <span class="custom-tree-node" slot-scope="{node,data}">
-        <span>{{ node.data.name }}</span>
-        <span>
-          <!-- 当为父节点展示此按钮 -->
-          <el-button v-if="node.level <= 2" type="text" size="mini" @click="() => append(data)">
-            添加
-          </el-button>
-          <!-- 当为子节点展示此按钮 -->
-          <el-button v-if="node.childNodes.length == 0" type="text" size="mini" @click="() => remove(node, data)">
-            删除
-          </el-button>
-          <!-- 任何时候都展示此按钮 -->
-          <el-button type="text" size="mini" @click="() => edit(data)">
-            修改
-          </el-button>
-        </span>
-      </span>
-    </el-tree>
+  <el-container>
+    <el-aside width="500px">
+      <div>
+        <el-tree show-checkbox node-key="catId" :data="menus" :default-expanded-keys="expandedKeys"
+          @node-click="handleNodeClick" :expand-on-click-node="true" :allow-drop="allowDrop"
+          @node-drag-enter="handleDragEnter" @node-drop="handleDrop" :draggable="draggableSwitch" width="50%"
+          ref="menuTree">
+          <span class="custom-tree-node" slot-scope="{node,data}">
+            <span>{{ node.data.name }}</span>
+            <span>
+              <!-- 当为父节点展示此按钮 -->
+              <el-button v-if="node.level <= 2" type="text" size="mini" @click="() => append(data)">
+                添加
+              </el-button>
+              <!-- 当为子节点展示此按钮 -->
+              <el-button v-if="node.childNodes.length == 0" type="text" size="mini" @click="() => remove(node, data)">
+                删除
+              </el-button>
+              <!-- 任何时候都展示此按钮 -->
+              <el-button type="text" size="mini" @click="() => edit(data)">
+                修改
+              </el-button>
+            </span>
+          </span>
+        </el-tree>
+      </div>
 
-    <!-- dialog -->
-    <el-dialog title="修改菜单信息" :visible.sync="centerDialogVisible" width="580px" center>
-      <el-form :model="category" label-position="right" label-width="150px">
-        <el-form-item label="分类名称">
-          <el-input v-model="category.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="分类图标">
-          <el-input v-model="category.icon" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="分类计量单位">
-          <el-input v-model="category.productUnit" autocomplete="off"></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="centerDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitData">确 定</el-button>
-      </span>
-    </el-dialog>
+    </el-aside>
+    <el-container>
+      <!-- <el-header>
+      </el-header> -->
+      <el-main>
 
-  </div>
+        <el-form ref="form" label-width="80px">
+          <el-form-item label="拖拽排序">
+            <el-switch v-model="draggableSwitch" active-text="开启" inactive-text="关闭">
+            </el-switch>
+          </el-form-item>
+          <el-form-item label="批量删除">
+            <el-button type="danger" @click="batchDelete">提交删除</el-button>
+          </el-form-item>
+        </el-form>
+
+        <!-- dialog -->
+        <el-dialog title="修改菜单信息" :visible.sync="centerDialogVisible" width="580px" center>
+          <el-form :model="category" label-position="right" label-width="150px">
+            <el-form-item label="分类名称">
+              <el-input v-model="category.name" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="分类图标">
+              <el-input v-model="category.icon" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="分类计量单位">
+              <el-input v-model="category.productUnit" autocomplete="off"></el-input>
+            </el-form-item>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="centerDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="submitData">确 定</el-button>
+          </span>
+        </el-dialog>
+      </el-main>
+
+    </el-container>
+  </el-container>
 </template>
 
 
@@ -55,7 +77,8 @@ export default {
   props: {},
   data() {
     return {
-      sortNode: [],
+      parentCid: 0,
+      draggableSwitch: false,
       category: {
         name: null,//
         catId: null,//
@@ -66,6 +89,7 @@ export default {
         showStatus: 1,//默认显示
         sort: 0
       },
+      sortNode: [],
       maxLevel: 0,//获取操作节点的子节点最大Level的值
       labelPosition: 'left',//Dialog对话框中表单对齐方式
       centerDialogVisible: false,//Dialog对话框默认关闭
@@ -83,7 +107,6 @@ export default {
   watch: {},
   //方法集合
   methods: {
-
     // ==================打开页面时加载数据==========================
     getMenus() {
       // 发送菜单树状结构请求
@@ -224,7 +247,7 @@ export default {
       // console.log("参数:", draggingNode, dropNode, type)
       this.countNodeLevel(draggingNode.data);
       let deep = this.maxLevel - draggingNode.data.catLevel + 1; //计算拖动节点的层级
-
+      console.log("当前节点的最大深度：", deep);
       if (type == 'inner') {
         let bool = (deep + dropNode.level) <= 3;
         // console.log(draggingNode.data.name, "插入->", dropNode.data.name, "【中】, 当前深度(", deep, ")+目标(", dropNode.level, ")<=3？", bool);
@@ -253,21 +276,21 @@ export default {
     // 拖拽成功完成时触发的事件
     // 共四个参数，依次为：被拖拽节点对应的 Node、结束拖拽时最后进入的节点、被拖拽节点的放置位置（before、after、inner）、event
     handleDrop(draggingNode, dropNode, dropType, ev) {
-      this.sortNode = [];
+      // 实时提交开启一下代码注释-1
+      // this.sortNode = [];
       console.log("拖拽成功完成时触发的事件: 操作节点:", draggingNode, "->目标", dropNode, "位置:【", dropType, "】");
       console.log("拖拽成功完成时触发的事件: 操作节点名", draggingNode.data.name, "->目标名", dropNode.data.name, "位置:【", dropType, "】");
       console.log("拖拽成功完成时触发的事件: 操作节点层级", draggingNode.data.catLevel, "->目标层级", dropNode.level, "位置:【", dropType, "】");
       // 1.从dropNode获取 当前拖拽节点的最新父节点ID
-      let parentCid = 0;
       let brother = null;
       if (dropType == 'inner') {
         // 1.1.当防止位置为目标节点的内部，那么当前拖拽节点的最新父节点ID，就是目标节点的id
-        parentCid = dropNode.data.catId;
+        this.parentCid = dropNode.data.catId;
       } else {
         // 1.2.否则就获取当前目标节点的父节点id
-        parentCid = dropNode.data.parentCid;
+        this.parentCid = dropNode.data.parentCid;
       }
-      console.log("最新父节点ID:", parentCid);
+      console.log("最新父节点ID:", this.parentCid);
 
       // 2.从dropNode获取 当前拖拽节点的最新排序
       if (dropType == 'inner') {
@@ -278,7 +301,7 @@ export default {
         // 1.2.否则就拖拽完成后的通过父节点获取平级兄弟节点
         brother = dropNode.parent.childNodes;
       }
-      console.log("最新父节点ID:", parentCid, "最新兄弟节点:", brother);
+      console.log("最新父节点ID:", this.parentCid, "最新兄弟节点:", brother);
 
       // 4.在3基础上获取最新的层级
       for (let i = 0; i < brother.length; i++) {
@@ -291,12 +314,31 @@ export default {
             // 修改子分类层级
             this.updatechildNodesLevel(brother[i]);
           }
-          this.sortNode.push({ catId: brother[i].data.catId, sort: i, parentCid: parentCid, catLevel: newLevel });  //3.2.从数组的原始对象获取ID,然后封装成新的对象，并且给排序字段赋值，放在draggableNode。
+          this.sortNode.push({ catId: brother[i].data.catId, sort: i, parentCid: this.parentCid, catLevel: newLevel });  //3.2.从数组的原始对象获取ID,然后封装成新的对象，并且给排序字段赋值，放在draggableNode。
         } else {//遍历到不是自己时，层级关系不变
           this.sortNode.push({ catId: brother[i].data.catId, sort: i });  //3.2.从数组的原始对象获取ID,然后封装成新的对象，并且给排序字段赋值，放在draggableNode。
         }
       }
       console.log("最新排序的ID:", this.sortNode);
+
+      // 实时提交开启一下代码注释-2
+      this.$http({
+        url: this.$http.adornUrl('/product/category/update/sort'),
+        method: 'post',
+        data: this.$http.adornData(this.sortNode, false)
+      }).then(({ data }) => {
+        this.$message({
+          type: 'success',
+          message: '排序修改完成!'
+        });
+        this.getMenus(); // 删除完成，刷新新的菜单
+        this.expandedKeys = [this.parentCid]; // 删除节点的父节点展开
+        this.sortNode = [];
+        this.maxLevel = 0//获取操作节点的子节点最大Level的值
+        this.parentCid = 0;//清空要展开的节点
+      });
+
+
 
       // 3.获取这些排好序的兄弟的id
       // for (let i = 0; i < brother.length; i++) {
@@ -321,7 +363,54 @@ export default {
           this.updatechildNodesLevel(node.childNodes[i]);//递归
         }
       }
+    },
+    //批量删除
+    batchDelete() {
+      // this拿到vue对象中所有组件，获取$refs中名字为menuTree的
+      // getCheckedNodes：若节点可被选择（即 show-checkbox 为 true），则返回目前被选中的节点所组成的数组
+      let checkedNodes = this.$refs.menuTree.getCheckedNodes();
+      console.log('checkedNodes:', checkedNodes);
+
+      // 获取所有对象的id
+      let checkedIds = [];
+      let checkedNames = [];
+      for (let i = 0; i < checkedNodes.length; i++) {
+        const node = checkedNodes[i];
+        checkedIds.push(node.catId);
+        checkedNames.push(node.name);
+      }
+      console.log('checkedIds:', checkedIds);
+      this.doBatchDelete(checkedIds,checkedNames);
+    },
+    doBatchDelete(checkedIds,checkedNames) {
+      this.$confirm(`是否删除<strong><ins>${checkedNames}</ins></strong>?`, '提示', {
+        dangerouslyUseHTMLString: true,//message 就会被当作 HTML 片段处理。
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 发送删除请求
+        this.$http({
+          url: this.$http.adornUrl('/product/category/delete/tree'),
+          method: 'post',
+          data: this.$http.adornData(checkedIds, false)
+        }).then(({ data }) => {
+          // 删除成功提示
+          this.$message({
+            type: 'success',
+            message: '批量删除成功!'
+          });
+          this.getMenus(); // 删除完成，刷新新的菜单
+        })
+      }).catch(() => {
+        // 取消删除操作
+        this.$message({
+          type: 'info',
+          message: '已取消批量删除'
+        });
+      });
     }
+
   },
   //生命周期- 创建完成（可以访问当前this 实例）
   created() {
