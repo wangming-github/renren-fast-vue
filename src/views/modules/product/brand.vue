@@ -19,7 +19,12 @@
       </el-table-column>
       <el-table-column prop="name" header-align="center" align="center" label="品牌名">
       </el-table-column>
-      <el-table-column prop="logo" header-align="center" align="center" label="品牌logo地址">
+      <el-table-column prop="logo" header-align="center" align="center" label="品牌logo">
+        <template slot-scope="scope">
+          <!-- <el-image style="width: 100px; height: 100px" :src="scope.row.logo" fit="contain">
+          </el-image> -->
+          <img :src="scope.row.logo" style="width: 100px; height: 100px">
+        </template>
       </el-table-column>
       <el-table-column prop="descript" header-align="center" align="center" label="介绍">
       </el-table-column>
@@ -57,6 +62,7 @@ import AddOrUpdate from './brand-add-or-update'
 export default {
   data() {
     return {
+      srcList: [],
       dataForm: {
         key: ''
       },
