@@ -88,7 +88,7 @@ export default {
       let { brandId, showStatus } = status;
       // 发送请求修改状态
       this.$http({
-        url: this.$http.adornUrl('/product/brand/update'),
+        url: this.$http.adornUrl('/product/brand/update/status'),
         method: 'post',
         // data: this.$http.adornData({ brandId: brandId, showStatus: showStatus }, false)
         // 发送对象的属性名和值都一样可以简写为以下{ brandId, showStatus}

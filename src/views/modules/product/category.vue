@@ -1,7 +1,10 @@
 <template>
-  <el-container>
-    <el-aside width="500px">
-      <div>
+  <!-- 布局模块 -->
+  <!-- 间距20 --> <!-- 每行有24列 -->
+  <el-row :gutter="20">
+    <!-- 6列作为菜单 -->
+    <el-col :span="6">
+      <div class="grid-content bg-purple">
         <el-tree show-checkbox node-key="catId" :data="menus" :default-expanded-keys="expandedKeys"
           @node-click="handleNodeClick" :expand-on-click-node="true" :allow-drop="allowDrop"
           @node-drag-enter="handleDragEnter" @node-drop="handleDrop" :draggable="draggableSwitch" width="50%"
@@ -25,45 +28,39 @@
           </span>
         </el-tree>
       </div>
+    </el-col>
+    <!-- 18列作为表格 -->
+    <el-col :span="18">
+      <el-form ref="form" label-width="80px">
+        <el-form-item label="拖拽排序">
+          <el-switch v-model="draggableSwitch" active-text="开启" inactive-text="关闭">
+          </el-switch>
+        </el-form-item>
+        <el-form-item label="批量删除">
+          <el-button type="danger" @click="batchDelete">提交删除</el-button>
+        </el-form-item>
+      </el-form>
 
-    </el-aside>
-    <el-container>
-      <!-- <el-header>
-      </el-header> -->
-      <el-main>
-
-        <el-form ref="form" label-width="80px">
-          <el-form-item label="拖拽排序">
-            <el-switch v-model="draggableSwitch" active-text="开启" inactive-text="关闭">
-            </el-switch>
+      <!-- dialog -->
+      <el-dialog title="修改菜单信息" :visible.sync="centerDialogVisible" width="580px" center>
+        <el-form :model="category" label-position="right" label-width="150px">
+          <el-form-item label="分类名称">
+            <el-input v-model="category.name" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="批量删除">
-            <el-button type="danger" @click="batchDelete">提交删除</el-button>
+          <el-form-item label="分类图标">
+            <el-input v-model="category.icon" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="分类计量单位">
+            <el-input v-model="category.productUnit" autocomplete="off"></el-input>
           </el-form-item>
         </el-form>
-
-        <!-- dialog -->
-        <el-dialog title="修改菜单信息" :visible.sync="centerDialogVisible" width="580px" center>
-          <el-form :model="category" label-position="right" label-width="150px">
-            <el-form-item label="分类名称">
-              <el-input v-model="category.name" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="分类图标">
-              <el-input v-model="category.icon" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="分类计量单位">
-              <el-input v-model="category.productUnit" autocomplete="off"></el-input>
-            </el-form-item>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="centerDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="submitData">确 定</el-button>
-          </span>
-        </el-dialog>
-      </el-main>
-
-    </el-container>
-  </el-container>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="centerDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="submitData">确 定</el-button>
+        </span>
+      </el-dialog>
+    </el-col>
+  </el-row>
 </template>
 
 
@@ -380,9 +377,9 @@ export default {
         checkedNames.push(node.name);
       }
       console.log('checkedIds:', checkedIds);
-      this.doBatchDelete(checkedIds,checkedNames);
+      this.doBatchDelete(checkedIds, checkedNames);
     },
-    doBatchDelete(checkedIds,checkedNames) {
+    doBatchDelete(checkedIds, checkedNames) {
       this.$confirm(`是否删除<strong><ins>${checkedNames}</ins></strong>?`, '提示', {
         dangerouslyUseHTMLString: true,//message 就会被当作 HTML 片段处理。
         confirmButtonText: '确定',
