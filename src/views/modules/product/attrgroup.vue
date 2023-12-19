@@ -18,12 +18,12 @@
           </el-form-item>
         </el-form>
         <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%;">
-          <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
+          style="width: 100%;" size="small">
+          <el-table-column type="selection" header-align="center" align="center" width="50" fixed></el-table-column>
           <el-table-column prop="attrGroupId" header-align="center" align="center" label="分组id"></el-table-column>
-          <el-table-column prop="attrGroupName" header-align="center" align="center" label="组名"></el-table-column>
+          <el-table-column prop="attrGroupName" header-align="center" align="center" label="组名" width="200"></el-table-column>
           <el-table-column prop="sort" header-align="center" align="center" label="排序"></el-table-column>
-          <el-table-column prop="descript" header-align="center" align="center" label="描述"></el-table-column>
+          <el-table-column prop="descript" header-align="center" align="center" label="描述" width="200"></el-table-column>
           <el-table-column prop="icon" header-align="center" align="center" label="组图标"></el-table-column>
           <el-table-column prop="catelogId" header-align="center" align="center" label="所属分类id"></el-table-column>
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">

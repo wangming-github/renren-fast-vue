@@ -1,9 +1,9 @@
 <template>
   <div>
     <el-dialog :close-on-click-modal="false" :visible.sync="visible" @closed="dialogClose">
-      <el-dialog width="40%" title="选择属性" :visible.sync="innerVisible" append-to-body>
+      <el-dialog width="50%" title="选择属性" :visible.sync="innerVisible" append-to-body>
         <div>
-          <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+          <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()" size="mini">
             <el-form-item>
               <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
             </el-form-item>
@@ -12,45 +12,45 @@
             </el-form-item>
           </el-form>
           <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="innerSelectionChangeHandle"
-            style="width: 100%;">
+            style="width: 100%;" size="mini">
             <el-table-column type="selection" header-align="center" align="center"></el-table-column>
-            <el-table-column prop="attrId" header-align="center" align="center" label="属性id"></el-table-column>
+            <el-table-column prop="attrId" header-align="center" align="center" label="属性id"
+              width="100"></el-table-column>
             <el-table-column prop="attrName" header-align="center" align="center" label="属性名"></el-table-column>
             <el-table-column prop="icon" header-align="center" align="center" label="属性图标"></el-table-column>
             <el-table-column prop="valueSelect" header-align="center" align="center" label="可选值列表"></el-table-column>
           </el-table>
+          <br>
           <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
-            :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
+            :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage" size="mini"
             layout="total, sizes, prev, pager, next, jumper"></el-pagination>
         </div>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="innerVisible = false">取 消</el-button>
-          <el-button type="primary" @click="submitAddRealtion">确认新增</el-button>
+          <el-button @click="innerVisible = false" size="mini">取 消</el-button>
+          <el-button type="primary" @click="submitAddRealtion" size="mini">确认新增</el-button>
         </div>
       </el-dialog>
+
       <el-row>
         <el-col :span="24">
-          <!-- <el-button type="primary" @click="addRelation">新建关联</el-button>
-          <el-button type="danger" @click="batchDeleteRelation"
-            :disabled="dataListSelections.length <= 0">批量删除</el-button> -->
-          <el-table :data="relationAttrs" style="width: 100%" @selection-change="selectionChangeHandle" border>
+          <el-table :data="relationAttrs" style="width: 100%" @selection-change="selectionChangeHandle" border
+            size="mini">
             <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-            <el-table-column prop="attrId" label="#"></el-table-column>
-            <el-table-column prop="attrName" label="属性名"></el-table-column>
-            <el-table-column prop="valueSelect" label="可选值">
+            <el-table-column prop="attrId" label="ID" header-align="center" align="center" width="100"></el-table-column>
+            <el-table-column prop="attrName" label="属性名" header-align="center" align="center"></el-table-column>
+            <el-table-column prop="valueSelect" label="可选值" header-align="center" align="center">
               <template slot-scope="scope">
                 <el-tooltip placement="top">
                   <div slot="content">
                     <span v-for="(i, index) in scope.row.valueSelect.split(';')" :key="index">
                       {{ i }}
-                      <br />
                     </span>
                   </div>
                   <el-tag>{{ scope.row.valueSelect.split(";")[0] + " ..." }}</el-tag>
                 </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column fixed="right" header-align="center" align="center" label="操作">
+            <el-table-column header-align="center" align="center" label="操作"  width="150">
               <template slot-scope="scope">
                 <el-button type="text" size="small" @click="relationRemove(scope.row.attrId)">移除</el-button>
               </template>
@@ -58,11 +58,12 @@
           </el-table>
         </el-col>
       </el-row>
-
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="addRelation">新建关联</el-button>
-        <el-button type="danger" @click="batchDeleteRelation" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button type="primary" @click="addRelation" size="mini">新建关联</el-button>
+        <el-button type="danger" @click="batchDeleteRelation" :disabled="dataListSelections.length <= 0"
+          size="mini">批量删除</el-button>
       </span>
+
     </el-dialog>
   </div>
 </template>
