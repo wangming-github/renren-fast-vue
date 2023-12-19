@@ -1,10 +1,10 @@
 <template>
   <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible"
     @closed="dialogClose">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="150px" size="small">
       <!--       @keyup.enter.native="dataFormSubmit()" -->
       <el-form-item label="属性名" prop="attrName">
-        <el-input v-model="dataForm.attrName" placeholder="属性名"></el-input>
+        <el-input v-model="dataForm.attrName" placeholder="属性名" style="width:80% "></el-input>
       </el-form-item>
       <el-form-item label="属性类型" prop="attrType">
         <el-select v-model="dataForm.attrType" placeholder="请选择">
@@ -19,16 +19,18 @@
       </el-form-item>
       <el-form-item label="可选值" prop="valueSelect">
         <!-- <el-input v-model="dataForm.valueSelect"></el-input> -->
-        <el-select v-model="dataForm.valueSelect" multiple filterable allow-create placeholder="请输入内容"></el-select>
+        <el-select v-model="dataForm.valueSelect" multiple filterable allow-create default-first-option
+          placeholder="请输入内容" style="width:80% ">
+        </el-select>
       </el-form-item>
       <el-form-item label="属性图标" prop="icon">
-        <el-input v-model="dataForm.icon" placeholder="属性图标"></el-input>
+        <el-input v-model="dataForm.icon" placeholder="属性图标" style="width:80% " ></el-input>
       </el-form-item>
       <el-form-item label="所属分类" prop="catelogId">
         <category-cascader :catelogPath.sync="catelogPath"></category-cascader>
       </el-form-item>
       <el-form-item label="所属分组" prop="attrGroupId" v-if="type == 1">
-        <el-select ref="groupSelect" v-model="dataForm.attrGroupId" placeholder="请选择">
+        <el-select ref="groupSelect" v-model="dataForm.attrGroupId" placeholder="请选择" style="width:50% ">
           <el-option v-for="item in attrGroups" :key="item.attrGroupId" :label="item.attrGroupName"
             :value="item.attrGroupId"></el-option>
         </el-select>

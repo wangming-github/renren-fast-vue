@@ -8,8 +8,8 @@
           由于有sync修饰符，所以cascader路径变化以后自动会修改父的catelogPath，这是结合子组件this.$emit("update:catelogPath",v);做的
       -->
   <div>
-    <el-cascader filterable clearable placeholder="试试搜索：手机" v-model="paths" :options="categorys"
-      :props="setting"></el-cascader>
+    <el-cascader filterable clearable placeholder="试试搜索：手机" v-model="paths" :options="categorys" :props="setting"
+      style="width:50% "></el-cascader>
   </div>
 </template>
 
