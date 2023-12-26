@@ -20,51 +20,70 @@
         </el-form-item>
       </el-form>
     </el-form>
-    <el-table
-      :data="dataList"
-      border
-      v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
-      style="width: 100%;"
-      @expand-change="getSkuDetails"
-    >
-      <el-table-column type="expand">
+
+    <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
+      style="width: 100%;" @expand-change="getSkuDetails" size="small">
+
+      <!-- <el-table-column type="expand"> -->
+      <!-- <template slot-scope="scope">
+          商品标题：{{ scope.row.skuTitle }}
+          <br />
+          商品副标题：{{ scope.row.skuSubtitle }}
+          <br />
+          商品描述：{{ scope.row.skuDesc }}
+          <br />
+          分类ID：{{ scope.row.catalogId }}
+          <br />
+          SpuID： {{ scope.row.spuId }}
+          <br />
+          品牌ID：{{ scope.row.brandId }}
+          <br />
+        </template> -->
+      <!-- </el-table-column> -->
+
+
+      <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
+      <el-table-column prop="skuTitle" header-align="center" align="center" width="350" label=" 商品标题"
+        fixed></el-table-column>
+      <el-table-column header-align="center" align="center" width="150" label=" 商品副标题">
         <template slot-scope="scope">
-          商品标题：{{scope.row.skuTitle}}
-          <br />
-          商品副标题：{{scope.row.skuSubtitle}}
-          <br />
-          商品描述：{{scope.row.skuDesc}}
-          <br />
-          分类ID：{{scope.row.catalogId}}
-          <br />
-          SpuID：{{scope.row.spuId}}
-          <br />
-          品牌ID：{{scope.row.brandId}}
-          <br />
+          <el-tooltip placement="top" effect="light">
+            <div slot="content">
+              {{ scope.row.skuSubtitle }}
+            </div>
+            <span>
+              {{ scope.row.skuSubtitle.length > 10 ? scope.row.skuSubtitle.substr(0, 7) + '...' : scope.row.skuSubtitle }}
+            </span>
+          </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-      <el-table-column prop="skuId" header-align="center" align="center" label="skuId"></el-table-column>
-      <el-table-column prop="skuName" header-align="center" align="center" label="名称"></el-table-column>
+
       <el-table-column prop="skuDefaultImg" header-align="center" align="center" label="默认图片">
         <template slot-scope="scope">
-          <img :src="scope.row.skuDefaultImg" style="width:80px;height:80px;" />
+          <el-tooltip placement="right">
+            <div slot="content">
+              <img :src="scope.row.skuDefaultImg" style="width:200px;height:200px;" />
+            </div>
+            <span>
+              <img :src="scope.row.skuDefaultImg" style="width:20px;height:20px;" />
+            </span>
+          </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="price" header-align="center" align="center" label="价格"></el-table-column>
-      <el-table-column prop="saleCount" header-align="center" align="center" label="销量"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+
+      <el-table-column prop="skuDesc" header-align="center" align="center" width="150" label=" 商品描述"></el-table-column>
+      <el-table-column prop="catalogId" header-align="center" align="center" width="150" label=" 分类ID"></el-table-column>
+      <el-table-column prop="spuId" header-align="center" align="center" width="100" label=" SpuID"></el-table-column>
+      <el-table-column prop="brandId" header-align="center" align="center" width="100" label=" 品牌ID"></el-table-column>
+      <el-table-column prop="skuId" header-align="center" align="center" width="80" label="skuId"></el-table-column>
+      <el-table-column prop="skuName" header-align="center" align="center" label="名称" width="300"></el-table-column>
+      <el-table-column prop="price" header-align="center" align="center" label="价格" width="100"></el-table-column>
+      <el-table-column prop="saleCount" header-align="center" align="center" label="销量" width="100"></el-table-column>
+      <el-table-column fixed="right" header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="previewHandle(scope.row.skuId)">预览</el-button>
           <el-button type="text" size="small" @click="commentHandle(scope.row.skuId)">评论</el-button>
-          <el-dropdown
-            @command="handleCommand(scope.row,$event)"
-            size="small"
-            split-button
-            type="text"
-          >
-            更多
+          <el-dropdown @command="handleCommand(scope.row, $event)" size="small" split-button type="text">
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="uploadImages">上传图片</el-dropdown-item>
               <el-dropdown-item command="seckillSettings">参与秒杀</el-dropdown-item>
@@ -78,15 +97,9 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      @size-change="sizeChangeHandle"
-      @current-change="currentChangeHandle"
-      :current-page="pageIndex"
-      :page-sizes="[10, 20, 50, 100]"
-      :page-size="pageSize"
-      :total="totalPage"
-      layout="total, sizes, prev, pager, next, jumper"
-    ></el-pagination>
+    <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+      :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
+      layout="total, sizes, prev, pager, next, jumper"></el-pagination>
   </div>
 </template>
 

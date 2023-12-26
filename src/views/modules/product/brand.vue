@@ -17,9 +17,16 @@
       <el-table-column prop="brandId" header-align="center" align="center" label="品牌id"></el-table-column>
       <el-table-column prop="name" header-align="center" align="center" label="品牌名"></el-table-column>
       <el-table-column prop="logo" header-align="center" align="center" label="品牌logo地址">
+
         <template slot-scope="scope">
-          <!-- <el-image   style="width: 100px; height: 80px"  :src="scope.row.logo"  fit="fill"></el-image>-->
-          <img :src="scope.row.logo" style="width: 80px; height: 30px" />
+          <el-tooltip placement="right">
+            <div slot="content">
+              <img :src="scope.row.logo" style="width:240px;height:90px;" />
+            </div>
+            <span>
+              <img :src="scope.row.logo" style="width: 80px; height: 30px" />
+            </span>
+          </el-tooltip>
         </template>
       </el-table-column>
       <el-table-column prop="descript" header-align="center" align="center" label="介绍"></el-table-column>

@@ -1,23 +1,35 @@
 <template>
   <div class="mod-config">
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-      style="width: 100%;">
+      style="width: 100%;" size="mini" stripe>
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-      <el-table-column prop="id" header-align="center" align="center" label="id"></el-table-column>
-      <el-table-column prop="spuName" header-align="center" align="center" label="名称"></el-table-column>
-      <el-table-column prop="spuDescription" header-align="center" align="center" label="描述"></el-table-column>
-      <el-table-column prop="catalogId" header-align="center" align="center" label="分类"></el-table-column>
-      <el-table-column prop="brandId" header-align="center" align="center" label="品牌"></el-table-column>
-      <el-table-column prop="weight" header-align="center" align="center" label="重量"></el-table-column>
-      <el-table-column prop="publishStatus" header-align="center" align="center" label="上架状态">
+      <el-table-column prop="id" header-align="center" align="center" label="id" fixed></el-table-column>
+      <el-table-column prop="spuName" header-align="center" align="center" label="名称" width="200" fixed></el-table-column>
+      <el-table-column prop="spuDescription" header-align="center" align="center" label="描述" width="250">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.publishStatus == 0">新建</el-tag>
+          <el-tooltip placement="top" effect="light">
+            <div slot="content">
+              {{ scope.row.spuDescription }}
+            </div>
+            <span>
+              {{ scope.row.spuDescription.length > 10 ? scope.row.spuDescription.substr(0, 7) + '...' :
+                scope.row.spuDescription }}
+            </span>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      <el-table-column prop="catalogId" header-align="center" align="center" label="分类" width="100"></el-table-column>
+      <el-table-column prop="brandId" header-align="center" align="center" label="品牌" width="100"></el-table-column>
+      <el-table-column prop="weight" header-align="center" align="center" label="重量" width="100"></el-table-column>
+      <el-table-column prop="publishStatus" header-align="center" align="center" label="上架状态" width="100">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.publishStatus == 0" size="small">新建</el-tag>
           <el-tag v-if="scope.row.publishStatus == 1">已上架</el-tag>
           <el-tag v-if="scope.row.publishStatus == 2">已下架</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
-      <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间"></el-table-column>
+      <el-table-column prop="createTime" header-align="center" align="center" label="创建时间" width="150"></el-table-column>
+      <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间" width="150"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button v-if="scope.row.publishStatus == 0" type="text" size="small"
