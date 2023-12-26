@@ -1,22 +1,22 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()" size="small">
       <el-form :inline="true" :model="dataForm">
         <el-form-item label="分类">
-          <category-cascader :catelogPath.sync="catelogPath"></category-cascader>
+          <category-cascader :catelogPath.sync="catelogPath" size="small"></category-cascader>
         </el-form-item>
         <el-form-item label="品牌">
-          <brand-select style="width:160px"></brand-select>
+          <brand-select style="width:160px" size="small"></brand-select>
         </el-form-item>
         <el-form-item label="价格">
-          <el-input-number style="width:160px" v-model="dataForm.price.min" :min="0"></el-input-number>-
-          <el-input-number style="width:160px" v-model="dataForm.price.max" :min="0"></el-input-number>
+          <el-input-number style="width:160px" v-model="dataForm.price.min" :min="0" size="small"></el-input-number>-
+          <el-input-number style="width:160px" v-model="dataForm.price.max" :min="0" size="small"></el-input-number>
         </el-form-item>
         <el-form-item label="检索">
-          <el-input style="width:160px" v-model="dataForm.key" clearable></el-input>
+          <el-input style="width:160px" v-model="dataForm.key" clearable size="small"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="searchSkuInfo">查询</el-button>
+          <el-button type="primary" @click="searchSkuInfo" size="small">查询</el-button>
         </el-form-item>
       </el-form>
     </el-form>

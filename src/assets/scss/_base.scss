@@ -267,17 +267,18 @@ img {
         color: $sidebar--color-text-dark;
         &:focus,
         &:hover {
-          color: mix(#fff, $sidebar--color-text-dark, 50%);
-          background-color: mix(#fff, $sidebar--background-color-dark, 2.5%);
+          color: mix(#000000, $sidebar--color-text-dark, 100%);
+          background-color: mix(#f1f4f5, $sidebar--background-color-dark, 70.5%);
         }
       }
       .el-menu,
       .el-submenu.is-opened {
-        background-color: mix(#000, $sidebar--background-color-dark, 15%);
+        color: mix(#000000, $sidebar--color-text-dark, 100%);
+        background-color: mix(#f1f4f5, $sidebar--background-color-dark, 35%);
       }
       .el-menu-item.is-active,
       .el-submenu.is-active > .el-submenu__title {
-        color: mix(#fff, $sidebar--color-text-dark, 80%);
+        color: mix(#F74584, $sidebar--color-text-dark, 80%);
       }
     }
   }
