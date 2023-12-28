@@ -1,6 +1,6 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()"  size="small">
       <el-form-item label="仓库">
         <el-select style="width:120px;" v-model="dataForm.wareId" placeholder="请选择仓库" clearable>
           <el-option :label="w.name" :value="w.id" v-for="w in wareList" :key="w.id"></el-option>
@@ -20,11 +20,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button
-          v-if="isAuth('ware:purchasedetail:save')"
-          type="primary"
-          @click="addOrUpdateHandle()"
-        >新增</el-button>
+        <el-button v-if="isAuth('ware:purchasedetail:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-dropdown @command="handleBatchCommand" :disabled="dataListSelections.length <= 0">
           <el-button type="danger">
             批量操作
@@ -37,13 +33,8 @@
         </el-dropdown>
       </el-form-item>
     </el-form>
-    <el-table
-      :data="dataList"
-      border
-      v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
-      style="width: 100%;"
-    >
+    <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"  size="small"
+      style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" label="id"></el-table-column>
       <el-table-column prop="purchaseId" header-align="center" align="center" label="采购单id"></el-table-column>
@@ -53,11 +44,11 @@
       <el-table-column prop="wareId" header-align="center" align="center" label="仓库id"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status==0">新建</el-tag>
-          <el-tag type="info" v-if="scope.row.status==1">已分配</el-tag>
-          <el-tag type="wanring" v-if="scope.row.status==2">正在采购</el-tag>
-          <el-tag type="success" v-if="scope.row.status==3">已完成</el-tag>
-          <el-tag type="danger" v-if="scope.row.status==4">采购失败</el-tag>
+          <el-tag v-if="scope.row.status == 0">新建</el-tag>
+          <el-tag type="info" v-if="scope.row.status == 1">已分配</el-tag>
+          <el-tag type="wanring" v-if="scope.row.status == 2">正在采购</el-tag>
+          <el-tag type="success" v-if="scope.row.status == 3">已完成</el-tag>
+          <el-tag type="danger" v-if="scope.row.status == 4">采购失败</el-tag>
         </template>
       </el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
@@ -67,30 +58,18 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      @size-change="sizeChangeHandle"
-      @current-change="currentChangeHandle"
-      :current-page="pageIndex"
-      :page-sizes="[10, 20, 50, 100]"
-      :page-size="pageSize"
-      :total="totalPage"
-      layout="total, sizes, prev, pager, next, jumper"
-    ></el-pagination>
+    <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+      :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
+      layout="total, sizes, prev, pager, next, jumper"></el-pagination>
+
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <el-dialog title="合并到整单" :visible.sync="mergedialogVisible">
+    <el-dialog title="合并到整单" :visible.sync="mergedialogVisible" width="30%">
       <!-- id  assignee_id  assignee_name  phone   priority status -->
-      <el-select v-model="purchaseId" placeholder="请选择" clearable filterable>
-        <el-option
-          v-for="item in purchasetableData"
-          :key="item.id"
-          :label="item.id"
-          :value="item.id"
-        >
-          <span style="float: left">{{ item.id }}</span>
-          <span
-            style="float: right; color: #8492a6; font-size: 13px"
-          >{{ item.assigneeName }}：{{item.phone}}</span>
+      <el-select v-model="purchaseId" placeholder="请选择" clearable filterable size="small">
+        <el-option v-for="item in purchasetableData" :key="item.id" :label="item.id" :value="item.id">
+          <span style="float: left; color: #8492a6; font-size: 13px">{{ item.id }}</span>
+          <span style="float: right; color: #8492a6; font-size: 13px">{{ item.assigneeName }}：{{ item.phone }}</span>
         </el-option>
       </el-select>
       <span slot="footer" class="dialog-footer">
@@ -155,7 +134,7 @@ export default {
               this.getDataList();
             });
           })
-          .catch(() => {});
+          .catch(() => { });
       } else {
         this.$http({
           url: this.$http.adornUrl("/ware/purchase/merge"),
@@ -190,7 +169,7 @@ export default {
         } else {
           this.$alert("请先选择需要合并的需求", "提示", {
             confirmButtonText: "确定",
-            callback: action => {}
+            callback: action => { }
           });
         }
       }
@@ -258,8 +237,8 @@ export default {
       var ids = id
         ? [id]
         : this.dataListSelections.map(item => {
-            return item.id;
-          });
+          return item.id;
+        });
       this.$confirm(
         `确定对[id=${ids.join(",")}]进行[${id ? "删除" : "批量删除"}]操作?`,
         "提示",
