@@ -1,6 +1,6 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()"  size="small">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()" size="small">
       <el-form-item label="状态">
         <el-select style="width:120px;" v-model="dataForm.status" placeholder="请选择状态" clearable>
           <el-option label="新建" :value="0"></el-option>
@@ -23,12 +23,12 @@
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" size="small"
       style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-      <el-table-column prop="id" header-align="center" align="center" label="采购单id"  width="100"></el-table-column>
+      <el-table-column prop="id" header-align="center" align="center" label="采购单id" width="100" fixed="left"></el-table-column>
       <el-table-column prop="assigneeId" header-align="center" align="center" label="采购人id" width="100"></el-table-column>
       <el-table-column prop="assigneeName" header-align="center" align="center" label="采购人名"></el-table-column>
       <el-table-column prop="phone" header-align="center" align="center" label="联系方式"></el-table-column>
       <el-table-column prop="priority" header-align="center" align="center" label="优先级" width="100"></el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" label="状态"  width="100">
+      <el-table-column prop="status" header-align="center" align="center" label="状态" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status == 0">新建</el-tag>
           <el-tag type="info" v-if="scope.row.status == 1">已分配</el-tag>

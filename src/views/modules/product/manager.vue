@@ -75,7 +75,11 @@
       <el-table-column prop="catalogId" header-align="center" align="center" width="150" label=" 分类ID"></el-table-column>
       <el-table-column prop="spuId" header-align="center" align="center" width="100" label=" SpuID"></el-table-column>
       <el-table-column prop="brandId" header-align="center" align="center" width="100" label=" 品牌ID"></el-table-column>
-      <el-table-column prop="skuId" header-align="center" align="center" width="80" label="skuId"></el-table-column>
+      <el-table-column header-align="center" align="center" width="80" label="skuId">
+        <template slot-scope="scope">
+          <el-button size="mini"> {{ scope.row.skuId }}</el-button>
+        </template>
+      </el-table-column>
       <el-table-column prop="skuName" header-align="center" align="center" label="名称" width="300"></el-table-column>
       <el-table-column prop="price" header-align="center" align="center" label="价格" width="100"></el-table-column>
       <el-table-column prop="saleCount" header-align="center" align="center" label="销量" width="100"></el-table-column>

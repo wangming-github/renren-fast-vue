@@ -1,6 +1,6 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()"  size="small">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()" size="small">
       <el-form-item label="仓库">
         <el-select style="width:120px;" v-model="dataForm.wareId" placeholder="请选择仓库" clearable>
           <el-option :label="w.name" :value="w.id" v-for="w in wareList" :key="w.id"></el-option>
@@ -33,10 +33,15 @@
         </el-dropdown>
       </el-form-item>
     </el-form>
-    <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"  size="small"
+    <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" size="small"
       style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-      <el-table-column prop="id" header-align="center" align="center" label="id"></el-table-column>
+      <el-table-column header-align="center" align="center" label="id" fixed="left">
+        <template slot-scope="scope">
+          <i class="el-icon-star-off"></i>
+          <span style="margin-left: 10px">{{ scope.row.id }}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="purchaseId" header-align="center" align="center" label="采购单id"></el-table-column>
       <el-table-column prop="skuId" header-align="center" align="center" label="采购商品id"></el-table-column>
       <el-table-column prop="skuNum" header-align="center" align="center" label="采购数量"></el-table-column>
@@ -65,13 +70,16 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <el-dialog title="合并到整单" :visible.sync="mergedialogVisible" width="30%">
-      <!-- id  assignee_id  assignee_name  phone   priority status -->
-      <el-select v-model="purchaseId" placeholder="请选择" clearable filterable size="small">
-        <el-option v-for="item in purchasetableData" :key="item.id" :label="item.id" :value="item.id">
-          <span style="float: left; color: #8492a6; font-size: 13px">{{ item.id }}</span>
-          <span style="float: right; color: #8492a6; font-size: 13px">{{ item.assigneeName }}：{{ item.phone }}</span>
-        </el-option>
-      </el-select>
+
+      <el-tooltip class="item" effect="dark" content="不选中采购单时，将新建采购单" placement="top">
+        <el-select v-model="purchaseId" placeholder="请选择..." clearable filterable size="small" style="width:50% ">
+          <el-option v-for="item in purchasetableData" :key="item.id" :label="item.id" :value="item.id">
+            <span style="float: left; color: #8492a6; font-size: 13px">{{ item.id }}</span>
+            <span style="float: right; color: #8492a6; font-size: 13px">{{ item.assigneeName }}（{{ item.phone }} ）</span>
+          </el-option>
+        </el-select>
+      </el-tooltip>
+
       <span slot="footer" class="dialog-footer">
         <el-button @click="mergedialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="mergeItem">确 定</el-button>

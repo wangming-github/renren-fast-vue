@@ -1,24 +1,23 @@
 <template>
-  <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
-    :close-on-click-modal="false"
-    :visible.sync="visible"
-  >
-    <el-form
-      :model="dataForm"
-      :rules="dataRule"
-      ref="dataForm"
-      @keyup.enter.native="dataFormSubmit()"
-      label-width="120px"
-    >
-      <el-form-item label="采购商品id" prop="skuId">
-        <el-input v-model="dataForm.skuId" placeholder="采购商品id"></el-input>
+  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible" width="50%">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="120px"
+      size="small">
+      <!-- <el-form-item label="采购商品skuId" prop="skuId">
+        <el-input v-model="dataForm.skuId" placeholder="商品管理页[skuId]" style="width:50%"></el-input>
       </el-form-item>
+ -->
+      <el-form-item label="采购商品skuId" prop="skuId">
+        <el-select v-model="dataForm.skuId" placeholder="请选择商品" clearable style="width:50%">
+          <el-option :label="w.skuName" :value="w.skuId" v-for="w in skuList" :key="w.skuId"></el-option>
+        </el-select>
+      </el-form-item>
+
       <el-form-item label="采购数量" prop="skuNum">
-        <el-input v-model="dataForm.skuNum" placeholder="采购数量"></el-input>
+        <el-input-number v-model="dataForm.skuNum" :step="100" placeholder="采购数量" style="width:30%"
+          step-strictly></el-input-number>
       </el-form-item>
       <el-form-item label="仓库" prop="wareId">
-        <el-select v-model="dataForm.wareId" placeholder="请选择仓库" clearable>
+        <el-select v-model="dataForm.wareId" placeholder="请选择仓库" clearable style="width:70%">
           <el-option :label="w.name" :value="w.id" v-for="w in wareList" :key="w.id"></el-option>
         </el-select>
       </el-form-item>
@@ -46,6 +45,7 @@ export default {
     return {
       visible: false,
       wareList: [],
+      skuList: [],
       dataForm: {
         id: 0,
         purchaseId: "",
@@ -66,10 +66,24 @@ export default {
       }
     };
   },
-  created(){
+  created() {
     this.getWares();
+    this.getSkuList();
   },
   methods: {
+    getSkuList() {
+      this.$http({
+        url: this.$http.adornUrl("/product/skuinfo/list"),
+        method: "get",
+        params: this.$http.adornParams({
+          page: 1,
+          limit: 100
+        })
+      }).then(({ data }) => {
+        this.skuList = data.page.list;
+      });
+    },
+    // -------------------
     getWares() {
       this.$http({
         url: this.$http.adornUrl("/ware/wareinfo/list"),
