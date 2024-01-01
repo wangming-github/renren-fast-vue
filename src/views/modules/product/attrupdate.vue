@@ -2,53 +2,36 @@
   <div>
     <el-row :gutter="20">
       <el-col :span="16">
-        <el-card class="box-card">
+        <el-card class="box-card" :v-show="haveValue">
+          <div slot="header" class="clearfix">
+            <el-breadcrumb separator-class="el-icon-right">
+              <el-breadcrumb-item :to="{ path: '/product-spu' }"> <el-button type="text">不能直接访问此页面时，点击跳转到spu管理</el-button>
+              </el-breadcrumb-item>
+            </el-breadcrumb>
+            <el-button type="success" style="float:right" @click="submitSpuAttrs" size="small">确认修改</el-button>
+          </div>
+
           <el-tabs tab-position="left" style="width:98%">
-            <el-tab-pane
-              :label="group.attrGroupName"
-              v-for="(group,gidx) in dataResp.attrGroups"
-              :key="group.attrGroupId"
-            >
+            <el-tab-pane :label="group.attrGroupName" v-for="(group, gidx) in dataResp.attrGroups"
+              :key="group.attrGroupId">
+
               <!-- 遍历属性,每个tab-pane对应一个表单，每个属性是一个表单项  spu.baseAttrs[0] = [{attrId:xx,val:}]-->
               <el-form ref="form" :model="dataResp">
-                <el-form-item
-                  :label="attr.attrName"
-                  v-for="(attr,aidx) in group.attrs"
-                  :key="attr.attrId"
-                >
-                  <el-input
-                    v-model="dataResp.baseAttrs[gidx][aidx].attrId"
-                    type="hidden"
-                    v-show="false"
-                  ></el-input>
-                  <el-select
-                    v-model="dataResp.baseAttrs[gidx][aidx].attrValues"
-                    :multiple="attr.valueType == 1"
-                    filterable
-                    allow-create
-                    default-first-option
-                    placeholder="请选择或输入值"
-                  >
-                    <el-option
-                      v-for="(val,vidx) in attr.valueSelect.split(';')"
-                      :key="vidx"
-                      :label="val"
-                      :value="val"
-                    ></el-option>
+                <el-form-item :label="attr.attrName" v-for="(attr, aidx) in group.attrs" :key="attr.attrId">
+                  <el-input v-model="dataResp.baseAttrs[gidx][aidx].attrId" type="hidden" v-show="false"></el-input>
+                  <el-select v-model="dataResp.baseAttrs[gidx][aidx].attrValues" :multiple="attr.valueType == 1"
+                    filterable allow-create default-first-option placeholder="请选择或输入值">
+                    <el-option v-for="(val, vidx) in attr.valueSelect.split(';')" :key="vidx" :label="val"
+                      :value="val"></el-option>
                   </el-select>
-                  <el-checkbox
-                    v-model="dataResp.baseAttrs[gidx][aidx].showDesc"
-                    :true-label="1"
-                    :false-label="0"
-                  >快速展示</el-checkbox>
+                  <el-checkbox v-model="dataResp.baseAttrs[gidx][aidx].showDesc" :true-label="1"
+                    :false-label="0">快速展示</el-checkbox>
                 </el-form-item>
               </el-form>
             </el-tab-pane>
           </el-tabs>
-          <div style="margin:auto">
-            <el-button type="success" style="float:right" @click="submitSpuAttrs">确认修改</el-button>
-          </div>
         </el-card>
+
       </el-col>
     </el-row>
   </div>
@@ -60,6 +43,8 @@ export default {
   props: {},
   data() {
     return {
+      nullValue: false,
+      haveValue: false,
       spuId: "",
       catalogId: "",
       dataResp: {
@@ -72,7 +57,7 @@ export default {
   },
   computed: {},
   methods: {
-    clearData(){
+    clearData() {
       this.dataResp.attrGroups = [];
       this.dataResp.baseAttrs = [];
       this.spuAttrsMap = {};
@@ -92,7 +77,17 @@ export default {
       this.spuId = this.$route.query.spuId;
       this.catalogId = this.$route.query.catalogId;
       console.log("----", this.spuId, this.catalogId);
+
+      this.nullValue = false;
+      this.haveValue = false;
+
+      // 直接点击按钮 提示信息
+      if (typeof (this.spuId) == "undefined") {
+        this.nullValue = true;
+        this.haveValue = false;
+      }
     },
+
     showBaseAttrs() {
       let _this = this;
       this.$http({
@@ -104,23 +99,25 @@ export default {
       }).then(({ data }) => {
         //先对表单的baseAttrs进行初始化
         data.data.forEach(item => {
+
           let attrArray = [];
           item.attrs.forEach(attr => {
-            let v = "";
+            let value = "";
+
             if (_this.spuAttrsMap["" + attr.attrId]) {
-              v = _this.spuAttrsMap["" + attr.attrId].attrValue.split(";");
-              if (v.length == 1) {
-                v = v[0] + "";
+              value = _this.spuAttrsMap["" + attr.attrId].attrValue.split(";");
+              if (value.length == 1) {
+                value = value[0] + "";
               }
             }
+
             attrArray.push({
               attrId: attr.attrId,
               attrName: attr.attrName,
-              attrValues: v,
-              showDesc: _this.spuAttrsMap["" + attr.attrId]
-                ? _this.spuAttrsMap["" + attr.attrId].quickShow
-                : attr.showDesc
+              attrValues: value,
+              showDesc: _this.spuAttrsMap["" + attr.attrId] ? _this.spuAttrsMap["" + attr.attrId].quickShow : attr.showDesc
             });
+            // console.log(attr.attrId, value, attr.attrName);
           });
           this.dataResp.baseAttrs.push(attrArray);
         });
@@ -171,18 +168,18 @@ export default {
         .catch((e) => {
           this.$message({
             type: "info",
-            message: "已取消修改"+e
+            message: "已取消修改" + e
           });
         });
     }
   },
-  created() {},
+  created() { },
   activated() {
     this.clearData();
     this.getQueryParams();
     if (this.spuId && this.catalogId) {
-      this.showBaseAttrs();
       this.getSpuBaseAttrs();
+      this.showBaseAttrs();
     }
   }
 };
